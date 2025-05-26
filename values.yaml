@@ -1,0 +1,117 @@
+# Default values for n8n
+replicaCount: 1
+
+image:
+  repository: n8nio/n8n
+  pullPolicy: IfNotPresent
+  tag: "1.69.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 5678
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: n8n.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 5
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# n8n configuration
+n8n:
+  encryption_key: "change-me-to-a-random-string"
+  executions_mode: "queue"
+  queue_mode: "redis"
+  
+  # Environment variables
+  env:
+    NODE_ENV: "production"
+    WEBHOOK_URL: "https://n8n.local"
+    GENERIC_TIMEZONE: "UTC"
+    
+  # Persistence for user data
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 8Gi
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "n8n-postgres-password"
+    username: "n8n"
+    password: "n8n-password"
+    database: "n8n"
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Redis configuration  
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "n8n-redis-password"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
