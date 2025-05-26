@@ -205,16 +205,59 @@ helm dependency update
 helm upgrade n8n . -f values.yaml
 ```
 
+## Troubleshooting
+
+### First-Time Setup Issues
+
+If n8n shows a login screen instead of the setup wizard:
+
+**Reset to Fresh Installation:**
+```bash
+# 1. Uninstall current release
+helm uninstall n8n
+
+# 2. Delete PostgreSQL PVC to reset database
+kubectl delete pvc data-n8n-postgresql-0
+
+# 3. Reinstall fresh
+helm install n8n .
+```
+
+**Check Logs:**
+```bash
+kubectl logs deployment/n8n
+kubectl logs statefulset/n8n-postgresql
+```
+
+### Common Issues
+
+1. **Pods stuck in Pending**: Check PVC provisioning and resource limits
+2. **Database connection errors**: Verify PostgreSQL is running and accessible
+3. **Redis connection errors**: Check Redis master service availability
+
+### Getting Setup Wizard
+
+On first installation, n8n should show a setup wizard. If you see a login screen:
+- Database may have existing data
+- Use the reset procedure above
+- Check logs for specific errors
+
 ## Uninstalling
 
 ```bash
 helm uninstall n8n
 ```
 
-Note: This will not delete PersistentVolumeClaims by default. Delete them manually if needed:
+**Complete Cleanup (includes data):**
 ```bash
+# Uninstall release
+helm uninstall n8n
+
+# Delete all persistent data
 kubectl delete pvc -l app.kubernetes.io/instance=n8n
 ```
+
+**⚠️ Warning**: Deleting PVCs will permanently remove all n8n data, workflows, and database content.
 
 ## Support
 
