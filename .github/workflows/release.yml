@@ -18,8 +18,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write  # Changed from read to write for release uploads
       packages: write
+      actions: read
       
     steps:
       - name: Checkout repository
@@ -49,10 +50,17 @@ jobs:
           helm push "${CHART_FILE}" oci://${{ env.REGISTRY }}/${{ github.repository_owner }}
           
       - name: Upload chart to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: github.event_name == 'release'
         with:
           files: "*.tgz"
-          tag_name: ${{ github.event.release.tag_name }}
+          append_body: true
+          body: |
+            
+            ## 📦 Helm Chart Installation
+            
+            ```bash
+            helm install n8n oci://ghcr.io/${{ github.repository_owner }}/n8n --version ${{ github.event.release.tag_name }}
+            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
