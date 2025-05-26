@@ -136,12 +136,12 @@ n8n:
 ### Publishing Steps
 
 1. **Update Chart Version**: Modify `version` in `Chart.yaml`
-2. **Create Git Tag**: 
-   ```bash
-   git tag v0.1.0
-   git push origin v0.1.0
-   ```
-3. **GitHub Action**: The workflow automatically publishes to GitHub Container Registry
+2. **Create GitHub Release**: 
+   - Go to GitHub → Releases → Create a new release
+   - Set tag version (e.g., `v0.2.0`)
+   - Add release notes describing changes
+   - Click "Publish release"
+3. **GitHub Action**: The workflow automatically triggers and publishes to GitHub Container Registry
 
 ### Manual Publishing
 

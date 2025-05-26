@@ -1,9 +1,8 @@
 name: Release Helm Chart
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -49,11 +48,11 @@ jobs:
           CHART_FILE="${{ env.CHART_NAME }}-${CHART_VERSION}.tgz"
           helm push "${CHART_FILE}" oci://${{ env.REGISTRY }}/${{ github.repository_owner }}
           
-      - name: Create GitHub Release
+      - name: Upload chart to release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'release'
         with:
           files: "*.tgz"
-          generate_release_notes: true
+          tag_name: ${{ github.event.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
