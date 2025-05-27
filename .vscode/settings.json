@@ -1,0 +1,14 @@
+{
+	"yaml.schemas": {
+		"https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json": [
+			"tests/*_test.yaml"
+		]
+	},
+	"yaml.format.enable": true,
+	"yaml.validate": true,
+	"files.associations": {
+		"tests/*_test.yaml": "yaml"
+	},
+	"editor.formatOnSave": true,
+	"yaml.completion": true
+}

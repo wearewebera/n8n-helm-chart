@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: test ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: should not render ingress when disabled
+    set:
+      ingress.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render ingress when enabled with basic configuration
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-n8n
+      - equal:
+          path: spec.rules[0].host
+          value: n8n.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+
+  - it: should include className when specified
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+    set:
+      ingress.enabled: true
+      ingress.className: nginx
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+
+  - it: should include annotations when specified
+    set:
+      ingress.enabled: true
+      ingress.annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        cert-manager.io/cluster-issuer: letsencrypt
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/rewrite-target"]
+          value: /
+      - equal:
+          path: metadata.annotations["cert-manager.io/cluster-issuer"]
+          value: letsencrypt
+
+  - it: should include TLS configuration when specified
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      ingress.tls:
+        - secretName: n8n-tls
+          hosts:
+            - n8n.example.com
+    asserts:
+      - equal:
+          path: spec.tls[0].secretName
+          value: n8n-tls
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: n8n.example.com
+
+  - it: should use correct API version for k8s 1.19+
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - equal:
+          path: apiVersion
+          value: networking.k8s.io/v1
+
+  - it: should include correct labels
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: n8n
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm
