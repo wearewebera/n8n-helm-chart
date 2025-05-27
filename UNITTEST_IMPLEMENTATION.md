@@ -203,4 +203,4 @@ All test files include the JSON schema for validation and autocompletion:
 
 **✨ Implementation completed successfully!**
 
-Your N8N Helm chart now has a complete unit test suite that ensures quality and reliability of the chart in different configuration scenarios.
+Your N8N Helm chart now has a complete unit test suite that ensures quality and reliability of the chart in different configuration scenarios
