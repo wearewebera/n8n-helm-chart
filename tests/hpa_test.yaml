@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: test hpa
+templates:
+  - hpa.yaml
+tests:
+  - it: should not render hpa when autoscaling is disabled
+    set:
+      autoscaling.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render hpa when autoscaling is enabled
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 1
+      autoscaling.maxReplicas: 10
+      autoscaling.targetCPUUtilizationPercentage: 80
+    asserts:
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - equal:
+          path: apiVersion
+          value: autoscaling/v2
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-n8n
+      - equal:
+          path: spec.scaleTargetRef.apiVersion
+          value: apps/v1
+      - equal:
+          path: spec.scaleTargetRef.kind
+          value: Deployment
+      - equal:
+          path: spec.scaleTargetRef.name
+          value: RELEASE-NAME-n8n
+      - equal:
+          path: spec.minReplicas
+          value: 1
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+
+  - it: should include CPU metrics when targetCPUUtilizationPercentage is set
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 1
+      autoscaling.maxReplicas: 10
+      autoscaling.targetCPUUtilizationPercentage: 80
+    asserts:
+      - equal:
+          path: spec.metrics[0].type
+          value: Resource
+      - equal:
+          path: spec.metrics[0].resource.name
+          value: cpu
+      - equal:
+          path: spec.metrics[0].resource.target.type
+          value: Utilization
+      - equal:
+          path: spec.metrics[0].resource.target.averageUtilization
+          value: 80
+
+  - it: should include memory metrics when targetMemoryUtilizationPercentage is set
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 1
+      autoscaling.maxReplicas: 10
+      autoscaling.targetMemoryUtilizationPercentage: 70
+    asserts:
+      - contains:
+          path: spec.metrics
+          content:
+            type: Resource
+            resource:
+              name: memory
+              target:
+                type: Utilization
+                averageUtilization: 70
+
+  - it: should include both CPU and memory metrics when both are set
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 1
+      autoscaling.maxReplicas: 10
+      autoscaling.targetCPUUtilizationPercentage: 80
+      autoscaling.targetMemoryUtilizationPercentage: 70
+    asserts:
+      - lengthEqual:
+          path: spec.metrics
+          count: 2
+
+  - it: should include correct labels
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 1
+      autoscaling.maxReplicas: 10
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: n8n
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm

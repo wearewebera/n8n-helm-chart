@@ -1,0 +1,85 @@
+# Example values for testing different configurations
+# This file can be used with: helm unittest -v tests/values-test.yaml .
+
+# Basic test configuration
+replicaCount: 2
+
+image:
+  repository: n8nio/n8n
+  tag: "1.70.0"
+  pullPolicy: Always
+
+# Service configuration for testing
+service:
+  type: NodePort
+  port: 8080
+
+# ServiceAccount configuration for testing
+serviceAccount:
+  create: true
+  name: "custom-n8n-sa"
+  annotations:
+    example.com/annotation: "test-value"
+  automount: false
+
+# Ingress configuration for testing
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: n8n-test.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: n8n-test-tls
+      hosts:
+        - n8n-test.example.com
+
+# Autoscaling configuration for testing
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Resources for testing
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# N8N specific configuration for testing
+n8n:
+  encryption_key: "test-encryption-key-32-characters"
+  persistence:
+    enabled: true
+    size: 20Gi
+    accessMode: ReadWriteOnce
+    storageClass: fast-ssd
+
+# PostgreSQL configuration for testing
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "test-postgres-password"
+    username: "n8n_test"
+    password: "test-n8n-password"
+    database: "n8n_test"
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Redis configuration for testing
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "test-redis-password"

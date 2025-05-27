@@ -50,17 +50,21 @@ helm install n8n . -f values.yaml
 By default, n8n is accessible via ClusterIP service on port 5678. To access it:
 
 #### Port Forward (Development)
+
 ```bash
 kubectl port-forward service/n8n 5678:5678
 ```
+
 Then open http://localhost:5678
 
 #### Ingress (Production)
+
 Enable ingress in `values.yaml`:
+
 ```yaml
 ingress:
   enabled: true
-  className: "nginx"  # or your ingress class
+  className: 'nginx' # or your ingress class
   hosts:
     - host: n8n.yourdomain.com
       paths:
@@ -72,16 +76,16 @@ ingress:
 
 ### Key Configuration Options
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `replicaCount` | Number of n8n replicas | `1` |
-| `image.repository` | n8n image repository | `n8nio/n8n` |
-| `image.tag` | n8n image tag | `1.69.0` |
-| `n8n.encryption_key` | n8n encryption key | `change-me-to-a-random-string` |
-| `n8n.persistence.enabled` | Enable persistent storage | `true` |
-| `n8n.persistence.size` | Storage size | `8Gi` |
-| `postgresql.enabled` | Enable PostgreSQL | `true` |
-| `redis.enabled` | Enable Redis | `true` |
+| Parameter                 | Description               | Default                        |
+| ------------------------- | ------------------------- | ------------------------------ |
+| `replicaCount`            | Number of n8n replicas    | `1`                            |
+| `image.repository`        | n8n image repository      | `n8nio/n8n`                    |
+| `image.tag`               | n8n image tag             | `1.69.0`                       |
+| `n8n.encryption_key`      | n8n encryption key        | `change-me-to-a-random-string` |
+| `n8n.persistence.enabled` | Enable persistent storage | `true`                         |
+| `n8n.persistence.size`    | Storage size              | `8Gi`                          |
+| `postgresql.enabled`      | Enable PostgreSQL         | `true`                         |
+| `redis.enabled`           | Enable Redis              | `true`                         |
 
 ### Example Custom Values
 
@@ -105,9 +109,9 @@ autoscaling:
 
 ingress:
   enabled: true
-  className: "nginx"
+  className: 'nginx'
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
   hosts:
     - host: n8n.yourdomain.com
       paths:
@@ -119,11 +123,62 @@ ingress:
         - n8n.yourdomain.com
 
 n8n:
-  encryption_key: "your-super-secret-encryption-key-here"
+  encryption_key: 'your-super-secret-encryption-key-here'
   env:
-    WEBHOOK_URL: "https://n8n.yourdomain.com"
-    GENERIC_TIMEZONE: "America/New_York"
+    WEBHOOK_URL: 'https://n8n.yourdomain.com'
+    GENERIC_TIMEZONE: 'America/New_York'
 ```
+
+## Testing
+
+This Helm chart includes comprehensive unit tests using [helm-unittest](https://github.com/helm-unittest/helm-unittest).
+
+### Prerequisites
+
+Install the helm-unittest plugin:
+
+```bash
+helm plugin install https://github.com/helm-unittest/helm-unittest.git
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+helm unittest .
+
+# Run tests with verbose output
+helm unittest --color -v .
+
+# Run specific test file
+helm unittest -f 'tests/deployment_test.yaml' .
+
+# Generate JUnit XML output (useful for CI/CD)
+helm unittest -t junit -o test-results.xml .
+```
+
+### Test Coverage
+
+The test suite covers all major components:
+
+- ✅ **Deployment** - Image, replicas, security context, resources
+- ✅ **Service** - Type, ports, labels, selectors
+- ✅ **ServiceAccount** - Creation, annotations, automount
+- ✅ **Ingress** - Hosts, TLS, annotations, API versions
+- ✅ **HPA** - CPU/memory metrics, scaling configuration
+- ✅ **PVC** - Storage size, access modes, storage class
+- ✅ **Secret** - Encryption key handling
+
+See the [tests README](tests/README.md) for detailed information about the test suite.
+
+### CI/CD Integration
+
+The chart includes GitHub Actions workflow for automated testing:
+
+- Helm chart linting
+- Unit tests with helm-unittest
+- Integration tests with chart-testing
+- Security scanning with Trivy
 
 ## Publishing Your Own Version
 
@@ -136,7 +191,7 @@ n8n:
 ### Publishing Steps
 
 1. **Update Chart Version**: Modify `version` in `Chart.yaml`
-2. **Create GitHub Release**: 
+2. **Create GitHub Release**:
    - Go to GitHub → Releases → Create a new release
    - Set tag version (e.g., `v0.2.0`)
    - Add release notes describing changes
@@ -160,7 +215,7 @@ helm push n8n-0.1.0.tgz oci://ghcr.io/YOUR_USERNAME
 ### Making Chart Public
 
 1. **Repository Visibility**: Make your GitHub repository public
-2. **Package Visibility**: 
+2. **Package Visibility**:
    - Go to your GitHub profile → Packages
    - Find the `n8n` package
    - Go to Package settings → Change visibility → Public
@@ -183,6 +238,7 @@ helm install n8n . --dry-run --debug
 ### Dependencies
 
 This chart depends on:
+
 - [PostgreSQL](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) (Bitnami)
 - [Redis](https://github.com/bitnami/charts/tree/main/bitnami/redis) (Bitnami)
 
@@ -212,6 +268,7 @@ helm upgrade n8n . -f values.yaml
 If n8n shows a login screen instead of the setup wizard:
 
 **Reset to Fresh Installation:**
+
 ```bash
 # 1. Uninstall current release
 helm uninstall n8n
@@ -224,6 +281,7 @@ helm install n8n .
 ```
 
 **Check Logs:**
+
 ```bash
 kubectl logs deployment/n8n
 kubectl logs statefulset/n8n-postgresql
@@ -238,6 +296,7 @@ kubectl logs statefulset/n8n-postgresql
 ### Getting Setup Wizard
 
 On first installation, n8n should show a setup wizard. If you see a login screen:
+
 - Database may have existing data
 - Use the reset procedure above
 - Check logs for specific errors
@@ -249,6 +308,7 @@ helm uninstall n8n
 ```
 
 **Complete Cleanup (includes data):**
+
 ```bash
 # Uninstall release
 helm uninstall n8n
