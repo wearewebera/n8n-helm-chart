@@ -3,6 +3,9 @@ name: Helm Chart Tests
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
