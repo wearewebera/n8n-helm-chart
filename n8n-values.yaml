@@ -1,0 +1,38 @@
+# n8n deployment values
+n8n:
+  env:
+    NODE_ENV: "production"
+    WEBHOOK_URL: "https://n8n.local"
+    GENERIC_TIMEZONE: "UTC"
+    # Fix the N8N_PORT issue
+    N8N_PORT: "5678"
+    # Enforce proper file permissions
+    N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+    # Additional Redis configuration
+    QUEUE_BULL_REDIS_PORT: "6379"
+    QUEUE_BULL_REDIS_DB: "0"
+
+# Ensure Redis is properly configured
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: "your-secure-redis-password"  # Change this!
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "your-secure-postgres-password"  # Change this!
+    username: "n8n"
+    password: "your-secure-n8n-password"  # Change this!
+    database: "n8n"
+
+# Set a secure encryption key
+n8n:
+  encryption_key: "your-32-character-encryption-key"  # Generate with: openssl rand -hex 16
