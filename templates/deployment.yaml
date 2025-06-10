@@ -70,6 +70,8 @@ spec:
                   name: {{ include "n8n.fullname" . }}-redis
                   key: redis-password
             {{- end }}
+            - name: N8N_PORT
+              value: "5678"
             {{- if .Values.postgresql.enabled }}
             - name: DB_TYPE
               value: "postgresdb"
