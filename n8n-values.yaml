@@ -1,5 +1,7 @@
 # n8n deployment values
 n8n:
+  # Set a secure encryption key
+  encryption_key: "your-32-character-encryption-key"  # Generate with: openssl rand -hex 16
   env:
     NODE_ENV: "production"
     WEBHOOK_URL: "https://n8n.local"
@@ -32,7 +34,3 @@ postgresql:
     username: "n8n"
     password: "your-secure-n8n-password"  # Change this!
     database: "n8n"
-
-# Set a secure encryption key
-n8n:
-  encryption_key: "your-32-character-encryption-key"  # Generate with: openssl rand -hex 16
