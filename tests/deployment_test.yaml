@@ -15,7 +15,7 @@ tests:
           value: 1
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "n8nio/n8n:1.69.0"
+          value: "n8nio/n8n:1.95.3"
       - equal:
           path: spec.template.spec.containers[0].ports[0].containerPort
           value: 5678
