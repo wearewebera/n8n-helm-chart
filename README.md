@@ -87,6 +87,8 @@ ingress:
 
 Access via: `https://n8n.your-tailnet.ts.net` (or your custom hostname)
 
+**Note**: When Tailscale ingress is enabled, it takes precedence over standard ingress configuration.
+
 ## Configuration
 
 ### Key Configuration Options

@@ -56,7 +56,7 @@ ingress:
   tls: []
   
   # Tailscale ingress configuration
-  # Set className: "tailscale" and configure tailscale-specific settings
+  # When enabled, takes precedence over standard ingress above
   tailscale:
     enabled: false
     # Optional: Specify hostname for Tailscale ingress (defaults to <release-name>-<namespace>)

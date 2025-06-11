@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled (not .Values.ingress.tailscale.enabled) -}}
 {{- $fullName := include "n8n.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if and .Values.ingress.className (not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class")) }}
@@ -56,9 +56,6 @@ spec:
               {{- end }}
           {{- end }}
     {{- end }}
-{{- end }}
-{{- if and .Values.ingress.enabled .Values.ingress.tailscale.enabled }}
----
 {{- end }}
 {{- if .Values.ingress.tailscale.enabled -}}
 {{- $fullName := include "n8n.fullname" . -}}
