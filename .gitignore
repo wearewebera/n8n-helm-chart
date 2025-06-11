@@ -1,0 +1,17 @@
+# Tools
+CLAUDE.md
+.claude
+.vscode/
+*.code-workspace
+.history/
+.cursor/
+.lovable/
+lovable.config.*
+.bolt/
+bolt.config.*
+.copilot/
+.openai/
+.codex/
+.ai/
+.codeium/
+.tabnine/
