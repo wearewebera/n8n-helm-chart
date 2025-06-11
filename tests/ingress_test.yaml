@@ -125,6 +125,7 @@ tests:
   # Tailscale ingress tests
   - it: should not render tailscale ingress when disabled
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: false
     asserts:
       - hasDocuments:
@@ -132,6 +133,7 @@ tests:
 
   - it: should render tailscale ingress when enabled
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: true
     asserts:
       - hasDocuments:
@@ -158,6 +160,7 @@ tests:
 
   - it: should include default hostname in tailscale ingress
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: true
     asserts:
       - equal:
@@ -167,6 +170,7 @@ tests:
 
   - it: should use custom hostname when specified
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: true
       ingress.tailscale.hostname: "n8n-custom"
     asserts:
@@ -177,6 +181,7 @@ tests:
 
   - it: should include funnel annotation when enabled
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: true
       ingress.tailscale.funnel: true
     asserts:
@@ -187,6 +192,7 @@ tests:
 
   - it: should include proxy-group annotation when specified
     set:
+      ingress.enabled: false
       ingress.tailscale.enabled: true
       ingress.tailscale.proxyGroup: "ingress-proxies"
     asserts:
