@@ -146,6 +146,133 @@ n8n:
     GENERIC_TIMEZONE: 'America/New_York'
 ```
 
+## ArgoCD Deployment
+
+### Important: Password Auto-generation Issue
+
+⚠️ **ArgoCD users must provide explicit passwords** for PostgreSQL, Redis, and n8n encryption key. The auto-generation feature using `randAlphaNum` generates different passwords on each sync, causing authentication failures.
+
+### Step 1: Generate Secure Passwords
+
+```bash
+# Generate passwords once and save them securely
+export POSTGRES_ADMIN_PASSWORD=$(openssl rand -base64 32)
+export POSTGRES_USER_PASSWORD=$(openssl rand -base64 32)
+export REDIS_PASSWORD=$(openssl rand -base64 32)
+export N8N_ENCRYPTION_KEY=$(openssl rand -hex 16)
+
+echo "PostgreSQL Admin: $POSTGRES_ADMIN_PASSWORD"
+echo "PostgreSQL User: $POSTGRES_USER_PASSWORD"
+echo "Redis: $REDIS_PASSWORD"
+echo "n8n Encryption: $N8N_ENCRYPTION_KEY"
+```
+
+### Step 2: Create ArgoCD Values File
+
+```yaml
+# argocd-values.yaml
+postgresql:
+  auth:
+    postgresPassword: "your-generated-postgres-admin-password"
+    password: "your-generated-postgres-user-password"
+
+redis:
+  auth:
+    password: "your-generated-redis-password"
+
+n8n:
+  encryption_key: "your-generated-n8n-encryption-key"
+  
+  # Optional: Configure ingress
+  # env:
+  #   WEBHOOK_URL: "https://n8n.yourdomain.com"
+```
+
+### Step 3: ArgoCD Application Manifest
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/wearewebera
+    targetRevision: 1.95.3-4
+    chart: n8n
+    helm:
+      values: |
+        postgresql:
+          auth:
+            postgresPassword: "your-generated-postgres-admin-password"
+            password: "your-generated-postgres-user-password"
+        redis:
+          auth:
+            password: "your-generated-redis-password"
+        n8n:
+          encryption_key: "your-generated-n8n-encryption-key"
+        ingress:
+          enabled: true
+          className: nginx
+          hosts:
+            - host: n8n.yourdomain.com
+              paths:
+                - path: /
+                  pathType: Prefix
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: n8n
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+```
+
+### Alternative: Using Existing Secrets
+
+If you prefer to manage secrets separately:
+
+1. Create secrets manually:
+```bash
+kubectl create secret generic postgresql-secret \
+  --from-literal=postgres-password="$POSTGRES_ADMIN_PASSWORD" \
+  --from-literal=password="$POSTGRES_USER_PASSWORD" \
+  -n n8n
+
+kubectl create secret generic redis-secret \
+  --from-literal=redis-password="$REDIS_PASSWORD" \
+  -n n8n
+
+kubectl create secret generic n8n-secret \
+  --from-literal=encryption-key="$N8N_ENCRYPTION_KEY" \
+  -n n8n
+```
+
+2. Reference them in ArgoCD values:
+```yaml
+postgresql:
+  auth:
+    existingSecret: postgresql-secret
+
+redis:
+  auth:
+    existingSecret: redis-secret
+
+n8n:
+  existingSecret: n8n-secret
+```
+
+### Important Notes for ArgoCD
+
+- **Never rely on auto-generated passwords** with ArgoCD
+- **Store passwords securely** in your secret management system
+- **Consider using** Sealed Secrets, SOPS, or Vault for production
+- **Backup your encryption key** - losing it means losing access to all n8n data
+
 ## Testing
 
 This Helm chart includes comprehensive unit tests using [helm-unittest](https://github.com/helm-unittest/helm-unittest).
