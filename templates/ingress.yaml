@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled (not .Values.ingress.tailscale.enabled) -}}
 {{- $fullName := include "n8n.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if and .Values.ingress.className (not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class")) }}
@@ -56,4 +56,32 @@ spec:
               {{- end }}
           {{- end }}
     {{- end }}
+{{- end }}
+{{- if .Values.ingress.tailscale.enabled -}}
+{{- $fullName := include "n8n.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $hostname := .Values.ingress.tailscale.hostname | default (printf "%s-%s" $fullName .Release.Namespace) -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-tailscale
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.ingress.tailscale.funnel }}
+    tailscale.com/funnel: "true"
+    {{- end }}
+    {{- if .Values.ingress.tailscale.proxyGroup }}
+    tailscale.com/proxy-group: {{ .Values.ingress.tailscale.proxyGroup | quote }}
+    {{- end }}
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: {{ $fullName }}
+      port:
+        number: {{ $svcPort }}
+  tls:
+    - hosts:
+        - {{ $hostname }}
 {{- end }}

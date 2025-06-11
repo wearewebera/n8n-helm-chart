@@ -1,0 +1,68 @@
+# Tailscale-specific n8n configuration example
+# This configuration enables Tailscale ingress for secure internal access
+
+# n8n configuration
+n8n:
+  # Generate a secure encryption key: openssl rand -hex 16
+  encryption_key: "your-32-character-encryption-key"
+  env:
+    NODE_ENV: "production"
+    # Update this to your actual Tailscale hostname
+    WEBHOOK_URL: "https://n8n.banjo-antares.ts.net"
+    GENERIC_TIMEZONE: "UTC"
+    # Task runner configuration (avoids deprecation warnings)
+    N8N_RUNNERS_ENABLED: "true"
+    OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
+
+# Tailscale ingress configuration
+ingress:
+  # Keep standard ingress disabled when using Tailscale
+  enabled: false
+  
+  # Enable Tailscale ingress
+  tailscale:
+    enabled: true
+    # Custom hostname for your tailnet (optional)
+    # If not specified, defaults to {release-name}-{namespace}
+    hostname: "n8n"
+    # Set to true to expose via Tailscale Funnel (public internet)
+    funnel: false
+    # Optional: ProxyGroup for HA (requires Tailscale 1.84+)
+    # proxyGroup: "ingress-proxies"
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    # Generate secure passwords: openssl rand -base64 32
+    postgresPassword: "your-secure-postgres-password"
+    username: "n8n"
+    password: "your-secure-n8n-password"
+    database: "n8n"
+
+# Redis configuration for queue mode
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    # Generate secure password: openssl rand -base64 32
+    password: "your-secure-redis-password"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Resource configuration
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Persistence for n8n data
+n8n:
+  persistence:
+    enabled: true
+    size: 8Gi
