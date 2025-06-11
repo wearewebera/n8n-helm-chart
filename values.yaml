@@ -54,6 +54,17 @@ ingress:
         - path: /
           pathType: Prefix
   tls: []
+  
+  # Tailscale ingress configuration
+  # Set className: "tailscale" and configure tailscale-specific settings
+  tailscale:
+    enabled: false
+    # Optional: Specify hostname for Tailscale ingress (defaults to <release-name>-<namespace>)
+    hostname: ""
+    # Optional: Enable Tailscale Funnel to expose to public internet
+    funnel: false
+    # Optional: ProxyGroup for HA configuration (requires Tailscale 1.84+)
+    proxyGroup: ""
 
 resources:
   limits:

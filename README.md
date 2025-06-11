@@ -72,6 +72,21 @@ ingress:
           pathType: Prefix
 ```
 
+#### Tailscale Ingress (Secure Internal Access)
+
+For secure access via [Tailscale](https://tailscale.com/kb/1439/kubernetes-operator-cluster-ingress):
+
+```yaml
+ingress:
+  tailscale:
+    enabled: true
+    hostname: "n8n"  # Optional: custom hostname (defaults to release-namespace)
+    funnel: false    # Optional: expose to public internet via Tailscale Funnel
+    proxyGroup: ""   # Optional: HA proxy group (requires Tailscale 1.84+)
+```
+
+Access via: `https://n8n.your-tailnet.ts.net` (or your custom hostname)
+
 ## Configuration
 
 ### Key Configuration Options

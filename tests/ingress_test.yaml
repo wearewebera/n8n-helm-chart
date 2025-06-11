@@ -121,3 +121,103 @@ tests:
       - equal:
           path: metadata.labels["app.kubernetes.io/managed-by"]
           value: Helm
+
+  # Tailscale ingress tests
+  - it: should not render tailscale ingress when disabled
+    set:
+      ingress.tailscale.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render tailscale ingress when enabled
+    set:
+      ingress.tailscale.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+          documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-n8n-tailscale
+          documentIndex: 0
+      - equal:
+          path: spec.ingressClassName
+          value: tailscale
+          documentIndex: 0
+      - equal:
+          path: spec.defaultBackend.service.name
+          value: RELEASE-NAME-n8n
+          documentIndex: 0
+      - equal:
+          path: spec.defaultBackend.service.port.number
+          value: 5678
+          documentIndex: 0
+
+  - it: should include default hostname in tailscale ingress
+    set:
+      ingress.tailscale.enabled: true
+    asserts:
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: RELEASE-NAME-n8n-NAMESPACE
+          documentIndex: 0
+
+  - it: should use custom hostname when specified
+    set:
+      ingress.tailscale.enabled: true
+      ingress.tailscale.hostname: "n8n-custom"
+    asserts:
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: "n8n-custom"
+          documentIndex: 0
+
+  - it: should include funnel annotation when enabled
+    set:
+      ingress.tailscale.enabled: true
+      ingress.tailscale.funnel: true
+    asserts:
+      - equal:
+          path: metadata.annotations["tailscale.com/funnel"]
+          value: "true"
+          documentIndex: 0
+
+  - it: should include proxy-group annotation when specified
+    set:
+      ingress.tailscale.enabled: true
+      ingress.tailscale.proxyGroup: "ingress-proxies"
+    asserts:
+      - equal:
+          path: metadata.annotations["tailscale.com/proxy-group"]
+          value: "ingress-proxies"
+          documentIndex: 0
+
+  - it: should render both standard and tailscale ingress when both enabled
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      ingress.tailscale.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Ingress
+          documentIndex: 0
+      - isKind:
+          of: Ingress
+          documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-n8n
+          documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-n8n-tailscale
+          documentIndex: 1
