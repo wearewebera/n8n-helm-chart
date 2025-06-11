@@ -236,35 +236,42 @@ spec:
 
 If you prefer to manage secrets separately:
 
-1. Create secrets manually:
+1. Create secrets manually (using the expected names for your release):
 ```bash
-kubectl create secret generic postgresql-secret \
+# For release name "n8n", the chart expects these secret names:
+kubectl create secret generic n8n-postgresql \
   --from-literal=postgres-password="$POSTGRES_ADMIN_PASSWORD" \
   --from-literal=password="$POSTGRES_USER_PASSWORD" \
   -n n8n
 
-kubectl create secret generic redis-secret \
+kubectl create secret generic n8n-redis \
   --from-literal=redis-password="$REDIS_PASSWORD" \
   -n n8n
 
-kubectl create secret generic n8n-secret \
+kubectl create secret generic n8n-encryption \
   --from-literal=encryption-key="$N8N_ENCRYPTION_KEY" \
   -n n8n
 ```
 
-2. Reference them in ArgoCD values:
+2. Reference the custom secret in ArgoCD values (for n8n encryption only):
 ```yaml
+# The PostgreSQL and Redis subcharts will create their own secrets
+# named n8n-postgresql and n8n-redis automatically
 postgresql:
   auth:
-    existingSecret: postgresql-secret
+    postgresPassword: "your-generated-postgres-admin-password"
+    password: "your-generated-postgres-user-password"
 
 redis:
   auth:
-    existingSecret: redis-secret
+    password: "your-generated-redis-password"
 
+# Only n8n supports using an existing secret
 n8n:
-  existingSecret: n8n-secret
+  existingSecret: n8n-encryption
 ```
+
+**Note**: The Bitnami PostgreSQL and Redis subcharts don't use `existingSecret` at the root level. They create secrets named `{release-name}-postgresql` and `{release-name}-redis` automatically.
 
 ### Important Notes for ArgoCD
 
