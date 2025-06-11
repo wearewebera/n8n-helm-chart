@@ -221,9 +221,9 @@ tests:
           documentIndex: 1
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-n8n
+          value: RELEASE-NAME-n8n-tailscale
           documentIndex: 0
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-n8n-tailscale
+          value: RELEASE-NAME-n8n
           documentIndex: 1
