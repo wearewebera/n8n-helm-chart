@@ -33,7 +33,7 @@ helm install n8n . -f n8n-values.yaml
 ### Option 2: Deploy with Inline Values (Quick Fix)
 
 ```bash
-helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-3 \
+helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-4 \
   --set n8n.env.N8N_PORT="5678" \
   --set n8n.env.N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS="true" \
   --set n8n.env.QUEUE_BULL_REDIS_PORT="6379" \
