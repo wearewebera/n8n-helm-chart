@@ -57,7 +57,9 @@ spec:
           {{- end }}
     {{- end }}
 {{- end }}
+{{- if and .Values.ingress.enabled .Values.ingress.tailscale.enabled }}
 ---
+{{- end }}
 {{- if .Values.ingress.tailscale.enabled -}}
 {{- $fullName := include "n8n.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
