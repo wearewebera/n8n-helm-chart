@@ -25,10 +25,10 @@ A Helm chart for deploying [n8n](https://n8n.io/) workflow automation platform w
 
 ```bash
 # Install latest version
-helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-1
+helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-2
 
 # Or with custom values
-helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-1 -f custom-values.yaml
+helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-2 -f custom-values.yaml
 ```
 
 #### From Source
@@ -238,7 +238,7 @@ helm package .
 helm registry login ghcr.io -u YOUR_USERNAME -p YOUR_GITHUB_TOKEN
 
 # Push to registry
-helm push n8n-1.95.3-1.tgz oci://ghcr.io/YOUR_USERNAME
+helm push n8n-1.95.3-2.tgz oci://ghcr.io/YOUR_USERNAME
 ```
 
 ### Making Chart Public
