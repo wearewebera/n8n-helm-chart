@@ -13,6 +13,9 @@ n8n:
     # Additional Redis configuration
     QUEUE_BULL_REDIS_PORT: "6379"
     QUEUE_BULL_REDIS_DB: "0"
+    # Enable new features to avoid deprecation warnings
+    N8N_RUNNERS_ENABLED: "true"
+    OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
 
 # Ensure Redis is properly configured
 redis:

@@ -24,11 +24,11 @@ A Helm chart for deploying [n8n](https://n8n.io/) workflow automation platform w
 #### From GitHub Container Registry (Recommended)
 
 ```bash
-# Add the chart repository
-helm install n8n oci://ghcr.io/wearewebera/n8n --version 0.1.0
+# Install latest version
+helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-1
 
 # Or with custom values
-helm install n8n oci://ghcr.io/wearewebera/n8n --version 0.1.0 -f custom-values.yaml
+helm install n8n oci://ghcr.io/wearewebera/n8n --version 1.95.3-1 -f custom-values.yaml
 ```
 
 #### From Source
@@ -80,7 +80,7 @@ ingress:
 | ------------------------- | ------------------------- | ------------------------------ |
 | `replicaCount`            | Number of n8n replicas    | `1`                            |
 | `image.repository`        | n8n image repository      | `n8nio/n8n`                    |
-| `image.tag`               | n8n image tag             | `1.69.0`                       |
+| `image.tag`               | n8n image tag             | `1.95.3`                       |
 | `n8n.encryption_key`      | n8n encryption key        | `change-me-to-a-random-string` |
 | `n8n.persistence.enabled` | Enable persistent storage | `true`                         |
 | `n8n.persistence.size`    | Storage size              | `8Gi`                          |
@@ -193,10 +193,24 @@ The chart includes GitHub Actions workflow for automated testing:
 1. **Update Chart Version**: Modify `version` in `Chart.yaml`
 2. **Create GitHub Release**:
    - Go to GitHub → Releases → Create a new release
-   - Set tag version (e.g., `v0.2.0`)
+   - Set tag version (e.g., `v1.95.3-2`)
    - Add release notes describing changes
    - Click "Publish release"
 3. **GitHub Action**: The workflow automatically triggers and publishes to GitHub Container Registry
+
+### Versioning Strategy
+
+This chart uses **App Version + Chart Revision** format:
+
+- **Chart Version**: `{n8n-version}-{chart-revision}` (e.g., `1.95.3-1`)
+- **App Version**: n8n version (e.g., `1.95.3`)
+
+Examples:
+- `1.95.3-1` - First chart release for n8n 1.95.3
+- `1.95.3-2` - Chart bug fix for n8n 1.95.3
+- `1.96.0-1` - First chart release for n8n 1.96.0
+
+This approach clearly shows both the n8n version and chart iteration.
 
 ### Manual Publishing
 
@@ -209,7 +223,7 @@ helm package .
 helm registry login ghcr.io -u YOUR_USERNAME -p YOUR_GITHUB_TOKEN
 
 # Push to registry
-helm push n8n-0.1.0.tgz oci://ghcr.io/YOUR_USERNAME
+helm push n8n-1.95.3-1.tgz oci://ghcr.io/YOUR_USERNAME
 ```
 
 ### Making Chart Public
